@@ -45,24 +45,34 @@ while choice1 == "N":
 	findSeq()
 	print("There are " + str(seq_number) + " sequences in the dataset you have chosen")
 	choice1 = input("Do you want to continue?,Y/N\n")
-#move on to next step
 	
 #find the number of species in this dataset
-get_header = "grep \">\" seq.fa > seq_header.fa"
-subprocess.call(get_header,shell=True)
-seq = open("seq_header.fa")
-spe_num = []
-for i in seq:
-	l1 = i.find('[')
-	l2 = i.find(']')
-	spe_num.append(i[l1:l2])
-spe_n = len(set(spe_num))
+def findSpec():
+	get_header = "grep \">\" seq.fa > seq_header.fa"
+	subprocess.call(get_header,shell=True)
+	seq = open("seq_header.fa")
+	spe_num = []
+	for i in seq:
+		l1 = i.find('[')
+		l2 = i.find(']')
+		spe_num.append(i[l1:l2])
+	spe_n = len(set(spe_num))
+	return spe_n
+findSpec()
+#Tell the user the number of species in this dataset and ask them if you want to continue
 print("There are " + str(spe_n) + " species in this dataset")
 choice2 = input("Do you want to continue with the current dataset? Y/N\n")
-if choice 2 = 'Y':
-	break
-else:
-	getInput()
+while choice2 == "N":
+        if choice2 == "Y":
+                break
+        print("Thanks, please then input what you want again")
+        getInput()
+        findSeq()
+	findSpec()
+        print("There are " + str(spe_n) + " species in this dataset")
+        choice2 = input("Do you want to continue?,Y/N\n")
+
+#move on to the main data processing procedure
 
 #using clustalo to align the data
 os.system("clustalo -i seq.fa > align.fa")
