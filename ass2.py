@@ -79,7 +79,7 @@ os.system("clustalo -i seq.fa > align.fa")
 print("The alignment data has been store in the align.fa file")
 
 #find a representative sequence for blast analysis
-def _find():
+def _findId():
 	f = open('align.fa','r')
 
 	item_list = f.read().split('>')[1:]
@@ -89,20 +89,27 @@ def _find():
 		_num.append(item.count('-'))
 
 	print('- number is ' + str(_num[_num.index(min(_num))]) + '\n')
-	print('The representative sequence is:\n')
+	print('The representative sequence ID is:\n')
+	rep_seq = item_list[_num.index(min(_num))]
+	ind = rep_seq.find(" ")
+        seq_id = rep_seq[0:ind]
+        return seq_id
 
-	return item_list[_num.index(min(_num))]	
+_findId()
 
-_find()
+#download the test sequence using the seq_id
 os.system("esearch -db protein -query seq_id | efetch -db protein -format fasta > test_seq.fa")
 #using this representative sequence for blast
 #make blast data base first
 subprocess.call("makeblstdb -in seq.fa -dbtype prot -out " + taxon_gp)
 
 #doing blast using test sequence and data base
-
-
+subprocess.call("blastp -db " + taxon_gp + " -query test_seq.fa -outfmt 7 > blastoutput.out")
 	
+#find the first 250 sequence id of the blastoutput file
+subprocess.call("grep -v \"#\" blastoutput.out | cut -f2 | head -250 > blast250.txt")
 
-
-
+#using pullseq to download these 250 sequences
+pu = "/localdisk/data/BPSM/Assignment2/pullseq -i seq.fa -n blast250.txt > seq_pull_250.fasta"
+print(pu)
+subprocess.call(pu,shell=True)
