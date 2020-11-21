@@ -94,9 +94,12 @@ def _find():
 	return item_list[_num.index(min(_num))]	
 
 _find()
-
+os.system("esearch -db protein -query seq_id | efetch -db protein -format fasta > test_seq.fa")
 #using this representative sequence for blast
 #make blast data base first
+subprocess.call("makeblstdb -in seq.fa -dbtype prot -out " + taxon_gp)
+
+#doing blast using test sequence and data base
 
 
 	
