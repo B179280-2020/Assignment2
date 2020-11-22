@@ -113,3 +113,8 @@ subprocess.call("grep -v \"#\" blastoutput.out | cut -f2 | head -250 > blast250.
 pu = "/localdisk/data/BPSM/Assignment2/pullseq -i seq.fa -n blast250.txt > seq_pull_250.fasta"
 print(pu)
 subprocess.call(pu,shell=True)
+
+#plotcon to plot the level of conservation
+plt = "plotcon -sequence seq_pull_250.fasta -winsize 6 -graph svg"
+print(plt)
+subprocess.call(plt,shell = True)
