@@ -95,10 +95,10 @@ def _findId():
         seq_id = rep_seq[0:ind]
         return seq_id
 
-_findId()
+seq_Id=_findId()
 
 #download the test sequence using the seq_id
-os.system("esearch -db protein -query seq_id | efetch -db protein -format fasta > test_seq.fa")
+os.system("esearch -db protein -query seq_Id | efetch -db protein -format fasta > test_seq.fa")
 #using this representative sequence for blast
 #make blast data base first
 subprocess.call("makeblstdb -in seq.fa -dbtype prot -out " + taxon_gp)
@@ -118,3 +118,28 @@ subprocess.call(pu,shell=True)
 plt = "plotcon -sequence seq_pull_250.fasta -winsize 6 -graph svg"
 print(plt)
 subprocess.call(plt,shell = True)
+print("The plot of the conservation level has been saved as a file.")
+
+#Ask the user if they want to show the plot on the screen
+choice3 = input("Do you want to display the plot?,Y/N\n")
+if choice3 == 'Y':
+    subprocess.call("display plotcon.svg", shell=True)
+else:
+    print("It's OK, you can check this plot later!")
+
+
+#Extra EMBOSS analysis to obtain more information
+#Using pepstats to obtain more information about the statistics of protein properties
+pep = "pepstats -sequence seq_pull_250.fasta -outfile seq250.pepstats -aadata -mwdata -pkdata"
+print(pep)
+subprocess.call(pep,shell=True)
+print("The statistics of protein properties of the 250 sequences from BLAST output have been stored in the seq250.pepstats file.")
+print("These statistics include molecular weight, charge, Isoelectric point etc...")
+
+
+
+#Using Inforalign analysis 
+inf = "infoalign -sequence seq_pull_250.fasta -outfile seq250.infoalign"
+print(inf)
+subprocess.call(inf,shell = True)
+print("The infoalign analysis results have been saved in seq250.infoalign file")
