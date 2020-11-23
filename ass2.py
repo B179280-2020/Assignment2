@@ -37,7 +37,7 @@ def sequence_check(seq_Num):
 sequence_check(seq_Num)
 
 #Tell the user the sequence number and ask them if they are willing to continue
-print("There are " + str(seq_number) + " sequences in the dataset you have chosen")
+print("There are " + str(seq_Num) + " sequences in the dataset you have chosen")
 choice1 = input("Do you want to continue?,Y/N\n")
 while choice1 == "N":
 	if choice1 == "Y":
@@ -65,20 +65,20 @@ spe_N = findSpec()
 print("There are " + str(spe_N) + " species in this dataset")
 choice2 = input("Do you want to continue with the current dataset? Y/N\n")
 while choice2 == "N":
-        if choice2 == "Y":
-                break
-        print("Thanks, please then input what you want again")
+	if choice2 == "Y":
+		break
+	print("Thanks, please then input what you want again")
 	getInput()
 	seq_Num = findSeq()
 	spe_N = findSpec()
-        print("There are " + str(spe_N) + " species in this dataset")
-        choice2 = input("Do you want to continue?,Y/N\n")
+	print("There are " + str(spe_N) + " species in this dataset")
+	choice2 = input("Do you want to continue?,Y/N\n")
 
 
 #Ask the user if they want to remove partial seqs in the dataset for further analysis
 print("Just a reminder, there may have some partial sequences in this dataset.")
 choice3 = input("Do you want to remove the partial sequences for further analysis? Y/N\n")
-if choice3 = "Y":
+if choice3 == "Y":
 	fu = "grep -v \"partial\" seq_header.fa > seq_fheader.fa"
 	print(fu)
 	subprocess.call(fu,shell=True)
@@ -94,11 +94,12 @@ if choice3 = "Y":
 	fl = "/localdisk/data/BPSM/Assignment2/pullseq -i seq.fa -n accf.txt > seq_full.fa"
 	print(fl)
 	subprocess.call(fl,shell=True)
-	os.remove("seq_full.fa")
+	os.remove("seq.fa")
 	os.rename("seq_full.fa","seq.fa")
 	print("Partial sequences have been removed, new sequences dataset has been stored in the seq.fa file")
 
-
+else:
+	print("OK, Let's do some analysis for the current dataset!")
 
 #move on to the main data processing procedure
 #using clustalo to align the data
@@ -127,8 +128,8 @@ def _findId():
 	print('The representative sequence ID is:\n')
 	rep_seq = item_list[_num.index(min(_num))]
 	ind = rep_seq.find(" ")
-        seq_id = rep_seq[0:ind]
-        return seq_id
+	seq_id = rep_seq[0:ind]
+	return seq_id
 
 seq_Id=_findId()
 
@@ -166,8 +167,8 @@ subprocess.call(plt,shell = True)
 print("The plot of the conservation level has been saved as a file.")
 
 #Ask the user if they want to show the plot on the screen
-choice3 = input("Do you want to display the plot?,Y/N\n")
-if choice3 == 'Y':
+choice4 = input("Do you want to display the plot?,Y/N\n")
+if choice4 == 'Y':
     subprocess.call("display plotcon.svg", shell=True)
 else:
     print("It's OK, you can check this plot later!")
@@ -192,7 +193,7 @@ print("The infoalign analysis results have been saved in seq250.infoalign file")
 
 #PROSITE analysis to find motifs
 blt250 = open("blast250.txt").read().split("\n")
-print(blt250[:-1])
+#print(blt250[:-1])
 motif_array = []
 found_motif = open('fnd_motifs.txt',"w")
 found_motif.write("Accession ID\tMotif\n")
@@ -214,6 +215,6 @@ for i in blt250[:-1]:
                         motif = line[index+2:]       #getting name of the Motif after '= ' and space, so I add 2
                         motif_array.append(motif)    #saving found motif names into array
                         found_motif.write('{0}\t{1}'.format(i,motif))
-
+found_motif.close()
 print("The output of all sequences' scanning for motifs from the PROSITE database are saved in the fnd_motifs.txt file")
 
