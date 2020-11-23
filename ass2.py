@@ -28,7 +28,7 @@ print("There are " + str(seq_Num) + " sequences in the dataset you have chosen")
 
 def sequence_check(seq_Num):
 	while seq_Num <= 1 or seq_Num >= 1000:
-		print("Sorry,there is no result or over 1000 sequences. Please check and input again!")
+		print("Sorry,there is something wrong with your input - no result or over 1000 sequence. Please input again!")
 		if seq_Num >= 1 and seq_Num <= 1000:
                         break
 		getInput()
@@ -80,7 +80,7 @@ print("Just a reminder, there may have some partial sequences in this dataset.")
 choice3 = input("Do you want to remove the partial sequences for further analysis? Y/N\n")
 if choice3 == "Y":
 	fu = "grep -v \"partial\" seq_header.fa > seq_fheader.fa"
-	print(fu)
+	#print(fu)
 	subprocess.call(fu,shell=True)
 
 #obtain headers without partial seqs
@@ -92,7 +92,7 @@ if choice3 == "Y":
 
 #pullseq all seqs from the header file generated above
 	fl = "/localdisk/data/BPSM/Assignment2/pullseq -i seq.fa -n accf.txt > seq_full.fa"
-	print(fl)
+	#print(fl)
 	subprocess.call(fl,shell=True)
 	os.remove("seq.fa")
 	os.rename("seq_full.fa","seq.fa")
@@ -104,7 +104,7 @@ else:
 #move on to the main data processing procedure
 #using clustalo to align the data
 clus = "clustalo -i seq.fa > align.fa"
-print(clus)
+#print(clus)
 subprocess.call(clus,shell=True)
 print("Clustalo has been successfully done!")
 print("The alignment data has been store in the align.fa file")
@@ -119,16 +119,15 @@ print("The alignment data has been store in the align.fa file")
 def _findId():
 	f = open('align.fa','r')
 
-	item_list = f.read().split('>')[1:]
+	item_list = f.read().split('>')[1:]      #split the contents and make it into a list
 	_num = []
 
 	for item in item_list:
 		_num.append(item.count('-'))
-	print('- number is ' + str(_num[_num.index(min(_num))]) + '\n')
-	print('The representative sequence ID is:\n')
 	rep_seq = item_list[_num.index(min(_num))]
 	ind = rep_seq.find(" ")
 	seq_id = rep_seq[0:ind]
+	print('The representative sequence ID is: ' + seq_id)
 	return seq_id
 
 seq_Id=_findId()
@@ -136,33 +135,33 @@ seq_Id=_findId()
 #download the test sequence using the seq_id
 os.system("esearch -db protein -query " + seq_Id + " | efetch -db protein -format fasta > test_seq.fa")
 
-#using this representative sequence for blast
+#using this representative sequence for blast analysis
 #make blast data base first
 mdb = "makeblastdb -in seq.fa -dbtype prot -out " + taxon_gp
-print(mdb)
+#print(mdb)
 subprocess.call(mdb,shell=True)
 
 
 #doing blast using test sequence and data base
 blt = "blastp -db " + taxon_gp + " -query test_seq.fa -outfmt 7 > blastoutput.out"
-print(blt)
+#print(blt)
 subprocess.call(blt,shell=True)
 
 	
 #find the first 250 sequence id of the blastoutput file
 fd = "grep -v \"#\" blastoutput.out | cut -f2 | head -250 > blast250.txt"
-print(fd)
+#print(fd)
 subprocess.call(fd,shell=True)
 
 
 #using pullseq to download these 250 sequences
 pu = "/localdisk/data/BPSM/Assignment2/pullseq -i seq.fa -n blast250.txt > seq_pull_250.fasta"
-print(pu)
+#print(pu)
 subprocess.call(pu,shell=True)
 
 #plotcon to plot the level of conservation
 plt = "plotcon -sequence seq_pull_250.fasta -winsize 6 -graph svg"
-print(plt)
+#print(plt)
 subprocess.call(plt,shell = True)
 print("The plot of the conservation level has been saved as a file.")
 
@@ -174,27 +173,12 @@ else:
     print("It's OK, you can check this plot later!")
 
 
-#Extra EMBOSS analysis to obtain more information
-#Using pepstats to obtain more information about the statistics of protein properties
-pep = "pepstats -sequence seq_pull_250.fasta -outfile seq250.pepstats -aadata -mwdata -pkdata"
-print(pep)
-subprocess.call(pep,shell=True)
-print("The statistics of protein properties of the 250 sequences from BLAST output have been stored in the seq250.pepstats file.")
-print("These statistics include molecular weight, charge, Isoelectric point etc...")
-
-
-
-#Using Inforalign analysis 
-inf = "infoalign -sequence seq_pull_250.fasta -outfile seq250.infoalign"
-print(inf)
-subprocess.call(inf,shell = True)
-print("The infoalign analysis results have been saved in seq250.infoalign file")
-
 
 #PROSITE analysis to find motifs
 blt250 = open("blast250.txt").read().split("\n")
 #print(blt250[:-1])
 motif_array = []
+#open a new txt file and make it writable
 found_motif = open('fnd_motifs.txt',"w")
 found_motif.write("Accession ID\tMotif\n")
 for i in blt250[:-1]:
@@ -210,11 +194,26 @@ for i in blt250[:-1]:
                 if re.search('#',line):         #skipping comments
                         next
                 elif re.search('Motif', line):       #searching for line where Motif word used
-                        line.rstrip()                #cutting new line from the end of line, in order to not to get in my match
-                        index = line.find("=")       #motif name is after the sign '=', that's why I want to get index of this sign
-                        motif = line[index+2:]       #getting name of the Motif after '= ' and space, so I add 2
+                        line.rstrip()               
+                        index = line.find("=")       #locate the motif 
+                        motif = line[index+2:]       #getting name of the Motif after '= ' and space
                         motif_array.append(motif)    #saving found motif names into array
                         found_motif.write('{0}\t{1}'.format(i,motif))
 found_motif.close()
 print("The output of all sequences' scanning for motifs from the PROSITE database are saved in the fnd_motifs.txt file")
 
+#Extra EMBOSS analysis to obtain more information
+#Using pepstats to obtain more information about the statistics of protein properties
+pep = "pepstats -sequence seq_pull_250.fasta -outfile seq250.pepstats -aadata -mwdata -pkdata"
+#print(pep)
+subprocess.call(pep,shell=True)
+print("The statistics of protein properties of the 250 sequences from BLAST output have been stored in the seq250.pepstats file.")
+print("These statistics include molecular weight, charge, Isoelectric point etc...")
+
+
+#Using Inforalign 
+inf = "infoalign -sequence seq_pull_250.fasta -outfile seq250.infoalign"
+#print(inf)
+subprocess.call(inf,shell = True)
+print("The infoalign analysis results have been saved in seq250.infoalign file")
+print("The summary information from pepstats and infoalign has been saved, you can check them later!")
