@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import os, sys, shutil,re
 import subprocess
-import matplotlib.pyplot as plt
 
 
 taxon_gp = ""
@@ -74,6 +73,31 @@ while choice2 == "N":
 	spe_N = findSpec()
         print("There are " + str(spe_N) + " species in this dataset")
         choice2 = input("Do you want to continue?,Y/N\n")
+
+
+#Ask the user if they want to remove partial seqs in the dataset for further analysis
+print("Just a reminder, there may have some partial sequences in this dataset.")
+choice3 = input("Do you want to remove the partial sequences for further analysis? Y/N\n")
+if choice3 = "Y":
+	fu = "grep -v \"partial\" seq_header.fa > seq_fheader.fa"
+	print(fu)
+	subprocess.call(fu,shell=True)
+
+#obtain headers without partial seqs
+	accf = open("accf.txt","w")
+	for i in open("seq_fheader.fa"):
+		h = i.split(">")
+		accf.write(h[1])
+	accf.close()	
+
+#pullseq all seqs from the header file generated above
+	fl = "/localdisk/data/BPSM/Assignment2/pullseq -i seq.fa -n accf.txt > seq_full.fa"
+	print(fl)
+	subprocess.call(fl,shell=True)
+	os.remove("seq_full.fa")
+	os.rename("seq_full.fa","seq.fa")
+	print("Partial sequences have been removed, new sequences dataset has been stored in the seq.fa file")
+
 
 
 #move on to the main data processing procedure
