@@ -45,6 +45,7 @@ while choice1 == "N":
 	print("Thanks, please then input what you want again")
 	getInput()
 	seq_Num = findSeq()
+	sequence_check(seq_Num)
 	print("There are " + str(seq_Num) + " sequences in the dataset you have chosen")
 	choice1 = input("Do you want to continue?,Y/N\n")
 	
@@ -103,6 +104,7 @@ else:
 
 #move on to the main data processing procedure
 #using clustalo to align the data
+print("First, Clustalo will be run!")
 clus = "clustalo -i seq.fa > align.fa"
 #print(clus)
 subprocess.call(clus,shell=True)
@@ -110,12 +112,10 @@ print("Clustalo has been successfully done!")
 print("The alignment data has been store in the align.fa file")
 
 
-#using clustalo to align the data
-os.system("clustalo -i seq.fa > align.fa")
-print("The alignment data has been store in the align.fa file")
 
 #find a representative sequence for blast analysis
 #find the sequence with the lease number of "-" in the align.fa file
+print("Let's find the representative sequence from the aligment results!")
 def _findId():
 	f = open('align.fa','r')
 
@@ -133,10 +133,13 @@ def _findId():
 seq_Id=_findId()
 
 #download the test sequence using the seq_id
+print("Second,BLAST will be run!")
+print("The representative sequence will be downloaded and served as a test sequence for BLAST.")
 os.system("esearch -db protein -query " + seq_Id + " | efetch -db protein -format fasta > test_seq.fa")
 
 #using this representative sequence for blast analysis
 #make blast data base first
+
 mdb = "makeblastdb -in seq.fa -dbtype prot -out " + taxon_gp
 #print(mdb)
 subprocess.call(mdb,shell=True)
@@ -146,20 +149,23 @@ subprocess.call(mdb,shell=True)
 blt = "blastp -db " + taxon_gp + " -query test_seq.fa -outfmt 7 > blastoutput.out"
 #print(blt)
 subprocess.call(blt,shell=True)
-
+print("BLAST analysis has been successfully done!")
 	
 #find the first 250 sequence id of the blastoutput file
+print("The 250 most similar sequences will be obtained from the BLAST results!")
 fd = "grep -v \"#\" blastoutput.out | cut -f2 | head -250 > blast250.txt"
 #print(fd)
 subprocess.call(fd,shell=True)
 
 
 #using pullseq to download these 250 sequences
+print("Now, it's time to download the 250 most similar sequences using pullseq!")
 pu = "/localdisk/data/BPSM/Assignment2/pullseq -i seq.fa -n blast250.txt > seq_pull_250.fasta"
 #print(pu)
 subprocess.call(pu,shell=True)
 
 #plotcon to plot the level of conservation
+print("Let's plot the level of conservation based on this dataset!")
 plt = "plotcon -sequence seq_pull_250.fasta -winsize 6 -graph svg"
 #print(plt)
 subprocess.call(plt,shell = True)
@@ -217,3 +223,6 @@ inf = "infoalign -sequence seq_pull_250.fasta -outfile seq250.infoalign"
 subprocess.call(inf,shell = True)
 print("The infoalign analysis results have been saved in seq250.infoalign file")
 print("The summary information from pepstats and infoalign has been saved, you can check them later!")
+
+#Ending
+print("Thanks for using this programme! This programme has finished! Hope you enjoy it!")
