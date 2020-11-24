@@ -2,7 +2,6 @@
 import os, sys, shutil,re
 import subprocess
 
-
 taxon_gp = ""
 #ask the user about what protein family and taxonomic group they like
 def getInput():
@@ -34,10 +33,10 @@ def sequence_check(seq_Num):
 		getInput()                                                  #if not in normal range, run the function above to ask for input again
 		seq_Num = findSeq()                                         
 		return seq_Num
-seq_n = sequence_check(seq_Num)
+sequence_check(seq_Num)
 
 #Tell the user the sequence number and ask them if they are willing to continue
-print("There are " + str(seq_n) + " sequences in the dataset you have chosen")      #tell the user the seqs number
+print("There are " + str(seq_Num) + " sequences in the dataset you have chosen")      #tell the user the seqs number
 choice1 = input("Do you want to continue?,Y/N\n")                          #ask the user if they are happy with the current dataset 
 while choice1 == "N":                                                      #loop until the user is happy
 	if choice1 == "Y":
@@ -45,8 +44,8 @@ while choice1 == "N":                                                      #loop
 	print("Thanks, please then input what you want again")
 	getInput()
 	seq_Num = findSeq()
-	seq_n = sequence_check(seq_Num)
-	print("There are " + str(seq_n) + " sequences in the dataset you have chosen")
+	sequence_check(seq_Num)
+	print("There are " + str(seq_Num) + " sequences in the dataset you have chosen")
 	choice1 = input("Do you want to continue?,Y/N\n")
 	
 #find the number of species in this dataset
@@ -74,8 +73,8 @@ while choice2 == "N":                                                           
 	getInput()
 	seq_Num = findSeq()
 	spe_N = findSpec()
-	seq_n = sequence_check(seq_Num)
-        print("There are " + str(seq_n) + " sequences in the dataset you have chosen")
+	sequence_check(seq_Num)
+	print("There are " + str(seq_Num) + " sequences in the dataset you have chosen")
 	print("There are " + str(spe_N) + " species in this dataset")
 	choice2 = input("Do you want to continue?,Y/N\n")
 
